@@ -7,17 +7,11 @@
  * @author Jakub Płoskonka
  * @date styczen 2025
  * @brief File containing definitions for accelerometer MMA8451Q.
- * @ver 0.1
+ * @ver 0.2
  */
 
 #include "accelerometer.h"
 
-/******************************************************************************\
-* Private memory declarations
-\******************************************************************************/
-static uint8_t error;
-static uint16_t timeout;
-volatile uint8_t dummy;
 /******************************************************************************\
 * Private prototypes
 \******************************************************************************/
@@ -64,7 +58,7 @@ void Accelerometer_SetRange(mma8451q_range_t range) {
 void Accelerometer_ReadData(accelerometer_data_t *data) {
     uint8_t buffer[6];
 
-    I2C_ReadRegisters(MMA8451Q_I2C_ADDRESS, MMA8451Q_REG_OUT_X_MSB, buffer, 6);
+    I2C_ReadRegBlock(MMA8451Q_I2C_ADDRESS, MMA8451Q_REG_OUT_X_MSB, 6, buffer);
 
     data->x = (int16_t)((buffer[0] << 8) | buffer[1]) >> 2; // Convert 14-bit X data
     data->y = (int16_t)((buffer[2] << 8) | buffer[3]) >> 2; // Convert 14-bit Y data

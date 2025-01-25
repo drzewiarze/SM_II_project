@@ -9,12 +9,17 @@ data: styczen 2025
 
 #include "accelerometer.h"
 #include "lcd1602.h"
-#include "frdm_bsp.h" 
+#include "frdm_bsp.h"
+#include "MKL05Z4.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-/**
- * @brief Main function.
- */
+
 int main(void) {
+
+    char display[]={0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20};
+
     // Struktura do przechowywania danych z akcelerometru
     accelerometer_data_t accelData;
 
@@ -32,21 +37,20 @@ int main(void) {
         // Wyświetlanie danych na LCD
         LCD1602_SetCursor(0, 0);
         LCD1602_Print("X:");
-        LCD1602_PrintNum(accelData.x);
+        sprintf(display, "%d", accelData)
+        LCD1602_Print(display);
 
         LCD1602_SetCursor(0, 1);
         LCD1602_Print("Y:");
-        LCD1602_PrintNum(accelData.y);
+        LCD1602_Print(accelData.y);
 
         LCD1602_SetCursor(8, 1);
         LCD1602_Print("Z:");
-        LCD1602_PrintNum(accelData.z);
+        LCD1602_Print(accelData.z);
 
         // Odświeżanie co 500 ms
-        DELAY(500);
+        DELAY(500)
     }
-
-    return 0;
 }
 
 
