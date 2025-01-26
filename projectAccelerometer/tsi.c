@@ -4,10 +4,10 @@
 
 /**
  * @file tsi.c
- * @author Sebastian Koryciak & Mariusz Soko³owski
- * @date Wrzesieñ 2024
+ * @author Jakub PÅ‚oskonka & Sebastian Koryciak & Mariusz Sokoï¿½owski
+ * @date styczen 2025
  * @brief File containing definitions.
- * @ver 0.2
+ * @ver 0.3
  */
 
 #include "tsi.h"
@@ -39,6 +39,7 @@ static uint16_t gu16Threshold[TOTAL_ELECTRODE]={THRESHOLD0,THRESHOLD1};
 static uint16_t gu16Delta[TOTAL_ELECTRODE];
 static uint8_t ongoing_elec=0;
 static uint8_t end_flag = FALSE;
+static uint8_t touchFieldFlag = 0;	// Flag indicating whether the touch field is touched
 
 void TSI_Init (void) {
   SIM->SCGC5 |= SIM_SCGC5_TSI_MASK;  /* Enable clock gating for TSI */
@@ -153,12 +154,19 @@ void change_electrode(void)
 	TSI0->DATA |= TSI_DATA_SWTS_MASK; 
 }
 /**
- * @brief Interrupt handler for Touch Slider.
+ * @brief TSI interrupt service function.
+ * Supports touch input on the touch field.
  */
-void TSI0_IRQHandler(void)
-{
-	TSI0->GENCS |= TSI_GENCS_EOSF_MASK; /* Clear End of Scan Flag */
-	change_electrode();
-} 
+void TSI0_IRQHandler(void) {
+    TSI0->GENCS |= TSI_GENCS_EOSF_MASK;     //  Clear scan end flag
+    change_electrode();                     //  Switching electrodes and updating data
+
+    // Check if any electrode has been touched
+    if (gu16Delta[0] > gu16Threshold[0] || gu16Delta[1] > gu16Threshold[1]) {
+        touchFieldFlag = 1; // Touching the field
+    } else {
+        touchFieldFlag = 0; // No touch
+    }
+}
 
 
