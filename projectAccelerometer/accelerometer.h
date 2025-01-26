@@ -38,14 +38,6 @@ typedef enum {
     MMA8451Q_RANGE_8g = 0x02  /* ±8g */
 } mma8451q_range_t;
 /**
- * @brief Structure for accelerometer data. 16-bit integer (signed), because the data is 14 bit.
- */
-typedef struct {
-    int16_t x; /* Acceleration in X axis */
-    int16_t y; /* Acceleration in Y axis */
-    int16_t z; /* Acceleration in Z axis */
-} accelerometer_data_t;
-/**
  * @brief Accelerometer initialization.
  */
 void Accelerometer_Init(void);

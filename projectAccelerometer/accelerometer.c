@@ -55,14 +55,18 @@ void Accelerometer_SetRange(mma8451q_range_t range) {
  * @brief Read accelerometer data.
  * @param data Pointer to structure to store the data.
  */
-void Accelerometer_ReadData(accelerometer_data_t *data) {
+void Accelerometer_ReadData(void) {
     uint8_t buffer[6];
+    double x,y,z;
+
 
     I2C_ReadRegBlock(MMA8451Q_I2C_ADDRESS, MMA8451Q_REG_OUT_X_MSB, 6, buffer);
 
-    data->x = (int16_t)((buffer[0] << 8) | buffer[1]) >> 2; // Convert 14-bit X data
-    data->y = (int16_t)((buffer[2] << 8) | buffer[3]) >> 2; // Convert 14-bit Y data
-    data->z = (int16_t)((buffer[4] << 8) | buffer[5]) >> 2; // Convert 14-bit Z data
+    switch (Accelerometer_ReadRegister(MMA8451Q_REG_CTRL_REG2) & 0x03)
+
+    x = (double)(int16_t)((buffer[0] << 8) | buffer[1]) >> 2; // Convert 14-bit X data
+    y = (double)(int16_t)((buffer[2] << 8) | buffer[3]) >> 2; // Convert 14-bit Y data
+    z = (double)(int16_t)((buffer[4] << 8) | buffer[5]) >> 2; // Convert 14-bit Z data
 }
 /**
  * @brief Configure interrupt for INT2 pin.
