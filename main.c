@@ -20,7 +20,7 @@ int main(void) {
     TSI_Init();                                             // Initializations Touch Panel
 
     while (1) {
-    Accelerometer_ReadData(&acc_data);                          // Reading data from the accelerometer
+    Accelerometer_ReadData(&acc_data);                      // Reading data from the accelerometer
 
     handle_touch_input(&current_axis);                      // Axis change handling
 
