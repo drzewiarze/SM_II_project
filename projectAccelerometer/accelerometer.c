@@ -29,44 +29,21 @@ void Accelerometer_Init(void) {
     regValue = Accelerometer_ReadRegister(MMA8451Q_REG_CTRL_REG1);
     regValue &= ~0x01; // Clear ACTIVE bit to put accelerometer in standby mode
     Accelerometer_WriteRegister(MMA8451Q_REG_CTRL_REG1, regValue);
-
-    Accelerometer_SetRange(MMA8451Q_RANGE_2g); // Set default range to ±2g
-
     regValue |= 0x01; // Set ACTIVE bit to start measurements
-    Accelerometer_WriteRegister(MMA8451Q_REG_CTRL_REG1, regValue);
-}
-/**
- * @brief Set the range of the accelerometer.
- * @param range The range to set (2g, 4g, 8g).
- */
-void Accelerometer_SetRange(mma8451q_range_t range) {
-    uint8_t regValue;
-
-    regValue = Accelerometer_ReadRegister(MMA8451Q_REG_CTRL_REG1);
-    regValue &= ~0x01; // Put accelerometer in standby mode
-    Accelerometer_WriteRegister(MMA8451Q_REG_CTRL_REG1, regValue);
-
-    Accelerometer_WriteRegister(MMA8451Q_REG_CTRL_REG2, range); // Set range
-
-    regValue |= 0x01; // Reactivate accelerometer
     Accelerometer_WriteRegister(MMA8451Q_REG_CTRL_REG1, regValue);
 }
 /**
  * @brief Read accelerometer data.
  * @param data Pointer to structure to store the data.
  */
-void Accelerometer_ReadData(void) {
-    uint8_t buffer[6];
-    double x,y,z;
+void Accelerometer_ReadData(struct accelerometer_data_t *ACC_DATA) {
+    uint8_t arrayXYZ[6];
+    
+    I2C_ReadRegBlock(MMA8451Q_I2C_ADDRESS, MMA8451Q_REG_OUT_X_MSB, 6, arrayXYZ);
 
-
-    I2C_ReadRegBlock(MMA8451Q_I2C_ADDRESS, MMA8451Q_REG_OUT_X_MSB, 6, buffer);
-
-    switch (Accelerometer_ReadRegister(MMA8451Q_REG_CTRL_REG2) & 0x03)
-
-    x = (double)(int16_t)((buffer[0] << 8) | buffer[1]) >> 2; // Convert 14-bit X data
-    y = (double)(int16_t)((buffer[2] << 8) | buffer[3]) >> 2; // Convert 14-bit Y data
-    z = (double)(int16_t)((buffer[4] << 8) | buffer[5]) >> 2; // Convert 14-bit Z data
+    ACC_DATA->x = ((double)((int16_t)((arrayXYZ[0]<<8)|arrayXYZ[1])>>2)/(4096>> MMA8451Q_RANGE_2g)); // Convert 14-bit X data
+    ACC_DATA->y = ((double)((int16_t)((arrayXYZ[2]<<8)|arrayXYZ[3])>>2)/(4096>> MMA8451Q_RANGE_2g)); // Convert 14-bit Y data
+    ACC_DATA->z = ((double)((int16_t)((arrayXYZ[4]<<8)|arrayXYZ[5])>>2)/(4096>> MMA8451Q_RANGE_2g)); // Convert 14-bit Z data
 }
 /**
  * @brief Configure interrupt for INT2 pin.

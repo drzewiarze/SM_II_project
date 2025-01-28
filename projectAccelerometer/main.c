@@ -1,13 +1,6 @@
-/*-------------------------------------------------------------------------------------
-Technika Mikroprocesorowa II - projekt
-Cel programu:   - Obsługa akcelerometru za pomocą przerwań, wykorzystując INT2 dołączone do PTA10. 
-                - Wyświetlanie danych z osi X, Y, Z oraz punku na wyswietlaczu lcd 16x2. 
-                - Zmiana wyświetlanych danych przy uzyciu pola dotykowego jako przycisku.
-Autor: Jakub Płoskonka
-data: styczen 2025
--------------------------------------------------------------------------------------*/
-
 #include "accelerometer.h"
+#include "dispData.h"
+#include "tsi.h"
 #include "lcd1602.h"
 #include "frdm_bsp.h"
 #include "MKL05Z4.h"
@@ -15,42 +8,37 @@ data: styczen 2025
 #include <string.h>
 #include <stdlib.h>
 
+struct accelerometer_data_t acc_data;
 
 int main(void) {
+    char display[17] = {0x20};                              // Initialize the array to 16 characters + '\0'
+    enum Axis current_axis = AXIS_X;                        // Default axis
 
-    char display[]={0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20};
+                                                            
+    LCD1602_Init();                                         // Initializations LCD
+    Accelerometer_Init();                                   // Initializations MMA8451Q
+    TSI_Init();                                             // Initializations Touch Panel
 
-    // Struktura do przechowywania danych z akcelerometru
-    accelerometer_data_t accelData;
-
-    // Inicjalizacja wyświetlacza LCD
-    LCD1602_Init();
-    // Inicjalizacja akcelerometru
-    Accelerometer_Init();
-    LCD1602_Print("Accelerometer OK");
-
-    // Główna pętla programu
     while (1) {
-        // Odczyt danych z akcelerometru
-        Accelerometer_ReadData(&accelData);
+    Accelerometer_ReadData(&acc_data);                      // Reading data from the accelerometer
 
-        // Wyświetlanie danych na LCD
-        LCD1602_SetCursor(0, 0);
-        LCD1602_Print("X:");
-        sprintf(display, "%d", accelData)
-        LCD1602_Print(display);
+    handle_touch_input(&current_axis);                      // Axis change handling
 
-        LCD1602_SetCursor(0, 1);
-        LCD1602_Print("Y:");
-        LCD1602_Print(accelData.y);
-
-        LCD1602_SetCursor(8, 1);
-        LCD1602_Print("Z:");
-        LCD1602_Print(accelData.z);
-
-        // Odświeżanie co 500 ms
-        DELAY(500)
+    switch (current_axis) {                                 // Displaying data for the selected axis
+        case AXIS_X:
+            sprintf(display, "Axis X: %+4.2f g", acc_data.x);
+            update_lcd_with_progress_bar(display, acc_data.x);
+            break;
+        case AXIS_Y:
+            sprintf(display, "Axis Y: %+4.2f g", acc_data.y);
+            update_lcd_with_progress_bar(display, acc_data.y);
+            break;
+        case AXIS_Z:
+            sprintf(display, "Axis Z: %+4.2f g", acc_data.z);
+            update_lcd_with_progress_bar(display, acc_data.z);
+            break;
     }
+
+    DELAY(1000);                                            // better for the eye
 }
-
-
+}
