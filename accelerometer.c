@@ -38,7 +38,7 @@ void Accelerometer_Init(void) {
  */
 void Accelerometer_ReadData(struct accelerometer_data_t *data) {
     uint8_t arrayXYZ[6];
-
+    
     I2C_ReadRegBlock(MMA8451Q_I2C_ADDRESS, MMA8451Q_REG_OUT_X_MSB, 6, arrayXYZ);
 
     data->x = ((double)((int16_t)((arrayXYZ[0]<<8)|arrayXYZ[1])>>2)/(4096>> MMA8451Q_RANGE_2g)); // Convert 14-bit X data

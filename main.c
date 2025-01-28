@@ -1,5 +1,6 @@
+#include "accelerometer.h"
+#include "dispData.h"
 #include "tsi.h"
-#include "view.h"
 #include "lcd1602.h"
 #include "frdm_bsp.h"
 #include "MKL05Z4.h"
@@ -7,27 +8,37 @@
 #include <string.h>
 #include <stdlib.h>
 
-// Zmienne globalne
-volatile uint8_t touchDetectedFlag;      // Flaga wykrycia dotyku
-enum ViewType currentView = VIEW_X;          // Początkowy widok
-
+struct accelerometer_data_t acc_data;
 
 int main(void) {
-    // Inicjalizacje
-    LCD1602_Init();      // Inicjalizacja LCD
-    TSI_Init();          // Inicjalizacja panelu dotykowego
-    View_Init();         // Inicjalizacja widoków osi (X, Y, Z)
+    char display[17] = {0x20};                              // Initialize the array to 16 characters + '\0'
+    enum Axis current_axis = AXIS_X;                        // Default axis
 
-    // Wyświetl początkowy widok
-    View_Update(currentView);
-	
+                                                            
+    LCD1602_Init();                                         // Initializations LCD
+    Accelerometer_Init();                                   // Initializations MMA8451Q
+    TSI_Init();                                             // Initializations Touch Panel
+
     while (1) {
-				touchDetectedFlag = TSI_ReadSlider() > 0 ? 1:0;
-        if (touchDetectedFlag) {            // Sprawdź flagę dotyku
+    Accelerometer_ReadData(&acc_data);                          // Reading data from the accelerometer
 
-          currentView = NextView(currentView); // Przełącz widok
-          View_Update(currentView);          	// Zaktualizuj widok na LCD
-					touchDetectedFlag = 0;          // Zresetuj flagę
-        }
+    handle_touch_input(&current_axis);                      // Axis change handling
+
+    switch (current_axis) {                                 // Displaying data for the selected axis
+        case AXIS_X:
+            sprintf(display, "Axis X: %+4.2f g", acc_data.x);
+            update_lcd_with_progress_bar(display, acc_data.x);
+            break;
+        case AXIS_Y:
+            sprintf(display, "Axis Y: %+4.2f g", acc_data.y);
+            update_lcd_with_progress_bar(display, acc_data.y);
+            break;
+        case AXIS_Z:
+            sprintf(display, "Axis Z: %+4.2f g", acc_data.z);
+            update_lcd_with_progress_bar(display, acc_data.z);
+            break;
     }
+
+    DELAY(1000);                                            // better for the eye
+}
 }
