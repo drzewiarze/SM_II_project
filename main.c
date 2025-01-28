@@ -39,6 +39,6 @@ int main(void) {
             break;
     }
 
-    DELAY(1000);                                            // better for the eye
+    DELAY(1000);                                            // better for the eye :)
 }
 }
