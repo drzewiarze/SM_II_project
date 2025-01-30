@@ -29,28 +29,24 @@ int main(void) {
 
     while (1) {
 			
-		if (odczytaj_dane_flaga ) {                         // Check if new data is available
-        odczytaj_dane_flaga = 0;                            // Reset the data ready flag
-        Accelerometer_ReadData(&acc_data);                  // Read data from the accelerometer
-        }
-   
-    handle_touch_input(&current_axis);                      // Handle touch input to change the current axis
-	Accelerometer_ReadData(&acc_data);                      // Reading data from the accelerometer again
-    switch (current_axis) {                                 // Displaying data for the selected axis
-        case AXIS_X:
-            sprintf(display, "Axis X: %+4.2f g", acc_data.x);   // Format and display data for axis X
-            update_lcd_with_progress_bar(display, acc_data.x);  // Update LCD with axis X data and progress bar
-            break;
-        case AXIS_Y:
-            sprintf(display, "Axis Y: %+4.2f g", acc_data.y);   // Format and display data for axis Y
-            update_lcd_with_progress_bar(display, acc_data.y);  // Update LCD with axis Y data and progress bar
-            break;
-        case AXIS_Z:
-            sprintf(display, "Axis Z: %+4.2f g", acc_data.z);   // Format and display data for axis Z
-            update_lcd_with_progress_bar(display, acc_data.z);  // Update LCD with axis Z data and progress bar
-            break;
+	if (odczytaj_dane_flaga ) {                         		// Check if new data is available
+        odczytaj_dane_flaga = 0;                            		// Reset the data ready flag
+			
+    	handle_touch_input(&current_axis);                      	// Handle touch input to change the current axis
+	Accelerometer_ReadData(&acc_data);                      	// Reading data from the accelerometer
+    	switch (current_axis) {                                 	// Displaying data for the selected axis
+        	case AXIS_X:
+            	sprintf(display, "Axis X: %+4.2f g", acc_data.x);   	// Format and display data for axis X
+            	update_lcd_with_progress_bar(display, acc_data.x);  	// Update LCD with axis X data and progress bar
+            	break;
+        	case AXIS_Y:
+            	sprintf(display, "Axis Y: %+4.2f g", acc_data.y);   	// Format and display data for axis Y
+            	update_lcd_with_progress_bar(display, acc_data.y);  	// Update LCD with axis Y data and progress bar
+            	break;
+        	case AXIS_Z:
+            	sprintf(display, "Axis Z: %+4.2f g", acc_data.z);   	// Format and display data for axis Z
+            	update_lcd_with_progress_bar(display, acc_data.z);  	// Update LCD with axis Z data and progress bar
+            	break;
+    	}
     }
-
-    //DELAY(1000);                                            // better for the eye
-}
 }
